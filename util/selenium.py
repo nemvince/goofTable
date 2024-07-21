@@ -1,16 +1,16 @@
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
 import json
 
 class SeleniumScraper:
   def __init__(self, logger):
     self.logger = logger
-    # Set the desired capabilities
-    self.desired_capabilities = DesiredCapabilities.CHROME
-    self.desired_capabilities['goog:loggingPrefs'] = {'performance': 'ALL'}
     # Create a new instance of the Chrome driver
-    self.driver = webdriver.Chrome()
+    try:
+      self.driver = webdriver.Chrome()
+    except Exception as e:
+      self.logger.error(f"Failed to create a new instance of the Chrome driver: {e}")
+      exit()
 
   def scrapeRequestsToFile(self, url = "https://petrik.edupage.org/timetable/"):
     # Navigate to the URL
@@ -24,13 +24,13 @@ class SeleniumScraper:
     for log in network_logs:
       if "__func" in log['params']['request']['url']:
         target_requests.append(log)
-    # Close the browser
+
     self.driver.quit()
     if not target_requests:
       self.logger.error("No target requests found")
       exit()
     idx = 0
-    # replicate the request
+
     for request in target_requests:
       if idx == 0:
         filename = "ttv"
