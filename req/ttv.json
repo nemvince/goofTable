@@ -1,0 +1,73 @@
+{
+    "method": "Network.requestWillBeSent",
+    "params": {
+        "documentURL": "https://petrik.edupage.org/timetable/",
+        "frameId": "1F89959494145C277C080197A0D623CA",
+        "hasUserGesture": false,
+        "initiator": {
+            "stack": {
+                "callFrames": [
+                    {
+                        "columnNumber": 53365,
+                        "functionName": "",
+                        "lineNumber": 0,
+                        "scriptId": "18",
+                        "url": "https://petrik.edupage.org/global/pics/js/bundles/bundle_main.min.js?dummy=214d1a"
+                    },
+                    {
+                        "columnNumber": 52647,
+                        "functionName": "",
+                        "lineNumber": 0,
+                        "scriptId": "18",
+                        "url": "https://petrik.edupage.org/global/pics/js/bundles/bundle_main.min.js?dummy=214d1a"
+                    },
+                    {
+                        "columnNumber": 1566,
+                        "functionName": "",
+                        "lineNumber": 0,
+                        "scriptId": "18",
+                        "url": "https://petrik.edupage.org/global/pics/js/bundles/bundle_main.min.js?dummy=214d1a"
+                    },
+                    {
+                        "columnNumber": 382,
+                        "functionName": "n",
+                        "lineNumber": 0,
+                        "scriptId": "18",
+                        "url": "https://petrik.edupage.org/global/pics/js/bundles/bundle_main.min.js?dummy=214d1a"
+                    }
+                ]
+            },
+            "type": "script"
+        },
+        "loaderId": "9257B3CB0FC34E751F28988F12509216",
+        "redirectHasExtraInfo": false,
+        "request": {
+            "hasPostData": true,
+            "headers": {
+                "Accept-Language": "en-US",
+                "Content-type": "application/json; charset=UTF-8",
+                "Referer": "https://petrik.edupage.org/timetable/",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+                "sec-ch-ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\""
+            },
+            "initialPriority": "High",
+            "isSameSite": true,
+            "method": "POST",
+            "mixedContentType": "none",
+            "postData": "{\"__args\":[null,2023],\"__gsh\":\"00000000\"}",
+            "postDataEntries": [
+                {
+                    "bytes": "eyJfX2FyZ3MiOltudWxsLDIwMjNdLCJfX2dzaCI6IjAwMDAwMDAwIn0="
+                }
+            ],
+            "referrerPolicy": "same-origin",
+            "url": "https://petrik.edupage.org/timetable/server/ttviewer.js?__func=getTTViewerData"
+        },
+        "requestId": "19616.93",
+        "timestamp": 605955.432966,
+        "type": "XHR",
+        "wallTime": 1721602972.982874
+    }
+}
