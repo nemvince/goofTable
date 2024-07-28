@@ -39,7 +39,7 @@ class Database:
         self.create_table(
             "classes",
             [
-                sa.Column("id", sa.Integer, primary_key=True),
+                sa.Column("id", sa.String, primary_key=True),
                 sa.Column("name", sa.String),
                 sa.Column("short", sa.String),
             ],
@@ -47,24 +47,24 @@ class Database:
         self.create_table(
             "groups",
             [
-                sa.Column("id", sa.Integer, primary_key=True),
-                sa.Column("divisionid", sa.Integer),
+                sa.Column("id", sa.String, primary_key=True),
+                sa.Column("divisionid", sa.String),
                 sa.Column("name", sa.String),
-                sa.Column("classid", sa.Integer),
+                sa.Column("classid", sa.String),
                 sa.Column("entireclass", sa.Boolean),
             ],
         )
         self.create_table(
             "teachers",
             [
-                sa.Column("id", sa.Integer, primary_key=True),
+                sa.Column("id", sa.String, primary_key=True),
                 sa.Column("name", sa.String),
             ],
         )
         self.create_table(
             "periods",
             [
-                sa.Column("id", sa.Integer, primary_key=True),
+                sa.Column("id", sa.String, primary_key=True),
                 sa.Column("name", sa.String),
                 sa.Column("start", sa.Time),
                 sa.Column("end", sa.Time),
@@ -73,7 +73,7 @@ class Database:
         self.create_table(
             "classrooms",
             [
-                sa.Column("id", sa.Integer, primary_key=True),
+                sa.Column("id", sa.String, primary_key=True),
                 sa.Column("name", sa.String),
                 sa.Column("short", sa.String),
             ],
@@ -81,12 +81,12 @@ class Database:
         self.create_table(
             "lessons",
             [
-                sa.Column("id", sa.Integer, primary_key=True),
+                sa.Column("id", sa.String, primary_key=True),
                 sa.Column("groupids", sa.String),
-                sa.Column("subjectid", sa.Integer),
+                sa.Column("subjectid", sa.String),
                 sa.Column("teacherids", sa.String),
-                sa.Column("periodid", sa.Integer),
-                sa.Column("duration", sa.Integer),
+                sa.Column("periodid", sa.String),
+                sa.Column("duration", sa.String),
             ],
         )
 
@@ -94,7 +94,11 @@ class Database:
         self.insert(
             "classes",
             [
-                {"id": class_.id, "name": class_.name, "short": class_.short}
+                {
+                    "id": class_.id,
+                    "name": class_.name,
+                    "short": class_.short,
+                }
                 for class_ in timetable.classes
             ],
         )

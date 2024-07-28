@@ -47,7 +47,5 @@ class EdupageScraper:
 
         self.logger.info("Successfully scraped timetable data")
 
-        exit()
-
         with LoggerUtils.timer(self.logger, "Inserting data into database"):
             self.db.update_timetable(timetable)
