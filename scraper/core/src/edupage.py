@@ -40,8 +40,8 @@ class EdupageScraper:
             try:
                 timetable = self.scrapeTimetable()
             except Exception as e:
-                self.logger.error(
-                    f"FATAL: Failed even after selenium rerun, something is wrong!\n{e}"
+                self.logger.critical(
+                    f"Failed even after selenium rerun, something is wrong!\n{e}"
                 )
                 exit()
 

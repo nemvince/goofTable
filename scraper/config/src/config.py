@@ -59,6 +59,10 @@ class Config:
                 return logging.INFO
 
     def get_data_path(self, path):
+        # check if the data directory exists, if not create it
+        if not os.path.exists(os.path.join(sys.path[0], self.get("data.directory"))):
+            os.makedirs(os.path.join(sys.path[0], self.get("data.directory")))
+
         return os.path.join(sys.path[0], self.get("data.directory"), path)
 
     def get_db_url(self):

@@ -1,6 +1,7 @@
 import json
 import logging
 
+from scraper.config import config
 from scraper.log import LoggerFactory
 
 from selenium import webdriver
@@ -59,6 +60,9 @@ class SeleniumScraper:
             exit()
 
         logs = self.driver.get_log("performance")
+        self.logger.info(f"Found {len(logs)} logs")
+
+        self.driver.quit()
         network_logs = [
             json.loads(log["message"])["message"]
             for log in logs
@@ -69,15 +73,10 @@ class SeleniumScraper:
             log for log in network_logs if "__func" in log["params"]["request"]["url"]
         ]
 
-        self.driver.quit()
-
         if not target_requests:
             self.logger.error("No target requests found")
             exit()
 
-        idx = 0
-        for request in target_requests:
-            filename = "ttv" if idx == 0 else "reg"
-            idx += 1
-            with open(f"req/{filename}.json", "w", encoding="utf-8") as f:
-                f.write(json.dumps(request, indent=4))
+        for x, r in zip(["ttv", "reg"], target_requests):
+            with open(config.get_data_path(f"{x}.json"), "w", encoding="utf-8") as f:
+                f.write(json.dumps(r))
