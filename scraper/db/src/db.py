@@ -5,7 +5,7 @@ from scraper.log import LoggerFactory
 from scraper.structures import Timetable
 
 import sqlalchemy as sa
-from sqlalchemy import Boolean, Column, Integer, String, Time, UUID, PickleType
+from sqlalchemy import Boolean, Column, Integer, PickleType, String, Time, UUID
 from sqlalchemy.ext.mutable import MutableList
 
 
@@ -48,18 +48,7 @@ class Database:
         self.connection.commit()
         self.logger.warning(f"Dropped table {table_name}")
 
-    # TODO: Make this work lol
-    def update_timetable(self, timetable: Timetable):
-        if config.get("db.drop_tables"):
-            self.drop_table("classes")
-            self.drop_table("groups")
-            self.drop_table("teachers")
-            self.drop_table("periods")
-            self.drop_table("classrooms")
-            self.drop_table("lessons")
-            self.drop_table("divisions")
-            self.logger.info("Dropped all tables")
-
+    def create_tables(self):
         _base_columns = [
             Column("id", UUID, primary_key=True),
             Column("edu_id", String),
@@ -119,6 +108,31 @@ class Database:
                 Column("duration", Integer),
             ],
         )
+
+        self.logger.info("Created all tables")
+
+    # TODO: Make this work lol
+    def update_timetable(self, timetable: Timetable):
+        # check if tables exist
+        self.metadata.reflect(self.engine)
+        tables = self.metadata.tables.keys()
+        if len(tables) == 0:
+            self.create_tables()
+        elif config.get("db.drop_tables"):
+            self.logger.warning(
+                "Dropping all tables due to config setting db.drop_tables"
+            )
+            self.drop_table("classes")
+            self.drop_table("groups")
+            self.drop_table("teachers")
+            self.drop_table("periods")
+            self.drop_table("classrooms")
+            self.drop_table("lessons")
+            self.drop_table("divisions")
+            self.logger.info("Dropped all tables")
+            self.create_tables()
+        else:
+            self.logger.debug("All tables already exist")
 
         # Insert data
         self.insert(
