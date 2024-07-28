@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -9,7 +10,9 @@ import tomllib
 class Config:
     def __init__(self):
         self.logger = LoggerFactory.create_logger("Config")
+
         conf_file = os.path.join(sys.path[0], "config.toml")
+
         try:
             with open(conf_file, "rb") as f:
                 self.config = tomllib.load(f)
@@ -22,7 +25,9 @@ class Config:
                     f.write(ex.read())
                     self.config = tomllib.load(ex)
         finally:
+            self.logger.setLevel(self.get_log_level())
             self.logger.info(f"Config loaded from {conf_file}")
+            self.logger.debug(f"Config: {self.config}")
 
     def get(self, key):
         key_split = key.split(".")
@@ -34,6 +39,24 @@ class Config:
         except KeyError:
             self.logger.error(f"Key {key} not found in config")
             return None
+
+    def get_log_level(self):
+        if self.get("scraper.debug"):
+            return logging.DEBUG
+
+        match self.get("scraper.loglevel"):
+            case "debug":
+                return logging.DEBUG
+            case "info":
+                return logging.INFO
+            case "warn":
+                return logging.WARN
+            case "error":
+                return logging.ERROR
+            case "critical":
+                return logging.CRITICAL
+            case _:
+                return logging.INFO
 
     def get_data_path(self, path):
         return os.path.join(sys.path[0], self.get("data.directory"), path)

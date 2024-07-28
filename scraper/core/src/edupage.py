@@ -18,8 +18,10 @@ class EdupageScraper:
         with LoggerUtils.timer(self.logger, "Fetching data"):
             data = self.replicator.runRequests()
 
-        with open("data.json", "w") as f:
-            json.dump(data, f)
+        if config.get("scraper.debug"):
+            self.logger.debug("Writing data to file")
+            with open(config.get_data_path("data.json"), "w") as f:
+                json.dump(data, f)
 
         with LoggerUtils.timer(self.logger, "Parsing data"):
             timetable = parseTimetable(data)

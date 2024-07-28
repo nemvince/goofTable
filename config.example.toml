@@ -1,3 +1,8 @@
+[scraper]
+loglevel = "info"
+# DEBUG overrides loglevel
+debug = false
+
 [data]
 directory = "data"
 

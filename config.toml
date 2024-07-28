@@ -1,3 +1,7 @@
+[scraper]
+loglevel = "debug"
+debug = true
+
 [data]
 directory = "data"
 
