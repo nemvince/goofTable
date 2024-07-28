@@ -1,4 +1,5 @@
 import copy
+import datetime
 
 from scraper.config import config
 from scraper.log import LoggerFactory
@@ -57,6 +58,14 @@ class Database:
         ]
 
         # Create tables
+        self.create_table(
+            "internal_data",
+            [
+                Column("key", String, primary_key=True),
+                Column("value", PickleType),
+            ],
+        )
+
         self.create_table(
             "classes",
             [*copy.deepcopy(_base_columns), Column("short", String)],
@@ -123,13 +132,8 @@ class Database:
             self.logger.warning(
                 "Dropping all tables due to config setting db.drop_tables"
             )
-            self.drop_table("classes")
-            self.drop_table("groups")
-            self.drop_table("teachers")
-            self.drop_table("periods")
-            self.drop_table("classrooms")
-            self.drop_table("lessons")
-            self.drop_table("divisions")
+            for table in list(tables):
+                self.drop_table(table)
             self.logger.info("Dropped all tables")
             self.create_tables()
         else:
@@ -223,6 +227,13 @@ class Database:
                     "duration": lesson.duration,
                 }
                 for lesson in timetable.lessons
+            ],
+        )
+
+        self.insert(
+            "internal_data",
+            [
+                {"key": "last_scrape", "value": datetime.datetime.now()},
             ],
         )
 

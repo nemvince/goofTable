@@ -8,7 +8,7 @@ __pycache__/
 
 # Artifact files
 data/*
-
+config.toml
 
 
 # Distribution / packaging
