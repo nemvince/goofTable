@@ -1,4 +1,12 @@
-from util.data.structures import Class, Classroom, Group, Lesson, Period, Teacher, Timetable
+from util.data.structures import (
+    Class,
+    Classroom,
+    Group,
+    Lesson,
+    Period,
+    Teacher,
+    Timetable,
+)
 
 
 def parseTimetable(data):

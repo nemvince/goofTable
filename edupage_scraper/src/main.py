@@ -11,7 +11,7 @@ class EdupageScraper:
     def __init__(self):
         self.logger = LoggerFactory.create_logger("EdupageScraper")
         self.replicator = Replicator()
-        self.db = Database("sqlite:///edupage.db")
+        self.db = Database()
 
     def scrapeTimetable(self):
         with LoggerUtils.timer(self.logger, "Fetching data"):
@@ -37,7 +37,9 @@ class EdupageScraper:
             try:
                 timetable = self.scrapeTimetable()
             except Exception as e:
-                self.logger.error(f"FATAL: Failed even after selenium rerun, something is wrong!\n{e}")
+                self.logger.error(
+                    f"FATAL: Failed even after selenium rerun, something is wrong!\n{e}"
+                )
                 exit()
 
         self.logger.info("Successfully scraped timetable data")

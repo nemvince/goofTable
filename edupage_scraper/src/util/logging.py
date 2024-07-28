@@ -13,7 +13,11 @@ class LoggerFactory:
 
         # Create a console handler
         handler = colorlog.StreamHandler()
-        handler.setFormatter(colorlog.ColoredFormatter('%(asctime)s - %(log_color)s%(name)s:%(levelname)s: %(message)s'))
+        handler.setFormatter(
+            colorlog.ColoredFormatter(
+                "%(asctime)s - %(log_color)s%(name)s:%(levelname)s: %(message)s"
+            )
+        )
 
         logger.addHandler(handler)
 
