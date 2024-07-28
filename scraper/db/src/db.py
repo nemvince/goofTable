@@ -228,7 +228,5 @@ class Database:
 
         self.connection.commit()
 
-        self.logger.info("Updated timetable data in database")
-
     def update_relationships(self):
         pass
