@@ -1,6 +1,6 @@
 [scraper]
-loglevel = "debug"
-debug = true
+loglevel = "info"
+debug = false
 
 [data]
 directory = "data"

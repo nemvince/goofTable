@@ -4,19 +4,23 @@ from contextlib import contextmanager
 
 import colorlog
 
-try:
-    from scraper.config import config
 
-    log_level = config.get_log_level()
-except ImportError:
-    log_level = logging.INFO
+def get_log_level():
+    try:
+        from scraper.config import config
+
+        return config.get_log_level()
+    except ImportError:
+        return logging.INFO
 
 
 class LoggerFactory:
     @staticmethod
-    def create_logger(name, level=log_level):
+    def create_logger(name, level=None):
+        if level is None:
+            level = get_log_level()
+
         logger = logging.getLogger(name)
-        logger.setLevel(level)
 
         # Create a console handler
         handler = colorlog.StreamHandler()
@@ -27,6 +31,7 @@ class LoggerFactory:
         )
 
         logger.addHandler(handler)
+        logger.setLevel(level)
 
         return logger
 
