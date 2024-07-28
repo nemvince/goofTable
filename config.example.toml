@@ -1,6 +1,5 @@
 [scraper]
 loglevel = "info"
-# DEBUG overrides loglevel
 debug = false
 
 [data]
@@ -8,6 +7,7 @@ directory = "data"
 
 [db]
 type = "sqlite"
+drop_tables = false
 
 [db.sqlite]
 name = "timetable.db"

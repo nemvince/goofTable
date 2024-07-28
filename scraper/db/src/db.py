@@ -1,7 +1,12 @@
+import copy
+
+from scraper.config import config
 from scraper.log import LoggerFactory
 from scraper.structures import Timetable
 
 import sqlalchemy as sa
+from sqlalchemy import Boolean, Column, Integer, String, Time, UUID, PickleType
+from sqlalchemy.ext.mutable import MutableList
 
 
 class Database:
@@ -16,7 +21,12 @@ class Database:
     def create_table(self, table_name, columns):
         table = sa.Table(table_name, self.metadata, *columns)
         table.create(bind=self.engine, checkfirst=True)
-        self.logger.info(f"Created table {table_name}")
+
+        # retrieve columns from table
+        table = sa.Table(table_name, self.metadata, autoload=True)
+        self.logger.info(
+            f"Created table {table_name} with columns {table.columns.keys()}"
+        )
 
     def insert(self, table_name, values):
         table = sa.Table(table_name, self.metadata, autoload=True)
@@ -29,64 +39,84 @@ class Database:
         return self.connection.execute(query).fetchall()
 
     def drop_table(self, table_name):
-        table = sa.Table(table_name, self.metadata, autoload=True)
-        table.drop()
+        self.metadata.reflect(self.engine)
+        table = self.metadata.tables.get(table_name)
+        if table is None:
+            self.logger.warning(f"Table {table_name} does not exist")
+            return
+        table.drop(bind=self.engine)
+        self.connection.commit()
         self.logger.warning(f"Dropped table {table_name}")
 
     # TODO: Make this work lol
     def update_timetable(self, timetable: Timetable):
+        if config.get("db.drop_tables"):
+            self.drop_table("classes")
+            self.drop_table("groups")
+            self.drop_table("teachers")
+            self.drop_table("periods")
+            self.drop_table("classrooms")
+            self.drop_table("lessons")
+            self.drop_table("divisions")
+            self.logger.info("Dropped all tables")
+
+        _base_columns = [
+            Column("id", UUID, primary_key=True),
+            Column("edu_id", String),
+            Column("name", String),
+        ]
+
         # Create tables
         self.create_table(
             "classes",
-            [
-                sa.Column("id", sa.String, primary_key=True),
-                sa.Column("name", sa.String),
-                sa.Column("short", sa.String),
-            ],
+            [*copy.deepcopy(_base_columns), Column("short", String)],
         )
         self.create_table(
             "groups",
             [
-                sa.Column("id", sa.String, primary_key=True),
-                sa.Column("divisionid", sa.String),
-                sa.Column("name", sa.String),
-                sa.Column("classid", sa.String),
-                sa.Column("entireclass", sa.Boolean),
+                *copy.deepcopy(_base_columns),
+                Column("divisionid", String),
+                Column("classid", String),
+                Column("entireclass", Boolean),
             ],
         )
         self.create_table(
             "teachers",
-            [
-                sa.Column("id", sa.String, primary_key=True),
-                sa.Column("name", sa.String),
-            ],
+            [*copy.deepcopy(_base_columns)],
         )
         self.create_table(
             "periods",
             [
-                sa.Column("id", sa.String, primary_key=True),
-                sa.Column("name", sa.String),
-                sa.Column("start", sa.Time),
-                sa.Column("end", sa.Time),
+                Column("id", UUID, primary_key=True),
+                Column("name", String),
+                Column("start", Time),
+                Column("end", Time),
             ],
         )
         self.create_table(
             "classrooms",
+            [*copy.deepcopy(_base_columns), Column("short", String)],
+        )
+
+        self.create_table(
+            "divisions",
             [
-                sa.Column("id", sa.String, primary_key=True),
-                sa.Column("name", sa.String),
-                sa.Column("short", sa.String),
+                Column("id", UUID, primary_key=True),
+                Column("edu_id", String),
+                Column("groupids", MutableList.as_mutable(PickleType)),
             ],
         )
+
         self.create_table(
             "lessons",
             [
-                sa.Column("id", sa.String, primary_key=True),
-                sa.Column("groupids", sa.String),
-                sa.Column("subjectid", sa.String),
-                sa.Column("teacherids", sa.String),
-                sa.Column("periodid", sa.String),
-                sa.Column("duration", sa.String),
+                Column("id", UUID, primary_key=True),
+                Column("edu_id", String),
+                Column("groupids", MutableList.as_mutable(PickleType)),
+                Column("subjectid", MutableList.as_mutable(PickleType)),
+                Column("teacherids", MutableList.as_mutable(PickleType)),
+                Column("periodid", Integer),
+                Column("duration", Integer),
             ],
         )
 
@@ -96,17 +126,20 @@ class Database:
             [
                 {
                     "id": class_.id,
+                    "edu_id": class_.edu_id,
                     "name": class_.name,
                     "short": class_.short,
                 }
                 for class_ in timetable.classes
             ],
         )
+
         self.insert(
             "groups",
             [
                 {
                     "id": group.id,
+                    "edu_id": group.edu_id,
                     "divisionid": group.divisionid,
                     "name": group.name,
                     "classid": group.classid,
@@ -115,32 +148,59 @@ class Database:
                 for group in timetable.groups
             ],
         )
+
         self.insert(
             "teachers",
             [
-                {"id": teacher.id, "name": teacher.name}
+                {"id": teacher.id, "edu_id": teacher.edu_id, "name": teacher.name}
                 for teacher in timetable.teachers
             ],
         )
+
         self.insert(
             "periods",
             [
-                {"name": period.name, "start": period.start, "end": period.end}
+                {
+                    "id": period.id,
+                    "name": period.name,
+                    "start": period.start,
+                    "end": period.end,
+                }
                 for period in timetable.periods
             ],
         )
+
         self.insert(
             "classrooms",
             [
-                {"id": classroom.id, "name": classroom.name, "short": classroom.short}
+                {
+                    "id": classroom.id,
+                    "edu_id": classroom.edu_id,
+                    "name": classroom.name,
+                    "short": classroom.short,
+                }
                 for classroom in timetable.classrooms
             ],
         )
+
+        self.insert(
+            "divisions",
+            [
+                {
+                    "id": division.id,
+                    "edu_id": division.edu_id,
+                    "groupids": division.groupids,
+                }
+                for division in timetable.divisions
+            ],
+        )
+
         self.insert(
             "lessons",
             [
                 {
                     "id": lesson.id,
+                    "edu_id": lesson.edu_id,
                     "groupids": lesson.groupids,
                     "subjectid": lesson.subjectid,
                     "teacherids": lesson.teacherids,
@@ -150,4 +210,10 @@ class Database:
                 for lesson in timetable.lessons
             ],
         )
+
+        self.connection.commit()
+
         self.logger.info("Updated timetable data in database")
+
+    def update_relationships(self):
+        pass

@@ -1,3 +1,21 @@
-from .src.structures import Class, Classroom, Group, Lesson, Period, Teacher, Timetable
+from .src.structures import (
+    Class,
+    Classroom,
+    Division,
+    Group,
+    Lesson,
+    Period,
+    Teacher,
+    Timetable,
+)
 
-__all__ = ["Class", "Classroom", "Group", "Lesson", "Period", "Teacher", "Timetable"]
+__all__ = [
+    "Class",
+    "Classroom",
+    "Division",
+    "Group",
+    "Lesson",
+    "Period",
+    "Teacher",
+    "Timetable",
+]

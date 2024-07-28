@@ -43,6 +43,13 @@ class Classroom:
         self.short = classroom["short"]
 
 
+class Division:
+    def __init__(self, division):
+        self.id = uuid.uuid4()
+        self.edu_id = division["id"]
+        self.groupids = division["groupids"]
+
+
 class Lesson:
     def __init__(self, lesson):
         self.id = uuid.uuid4()
@@ -61,4 +68,5 @@ class Timetable:
         self.teachers: list[Teacher] = []
         self.periods: list[Period] = []
         self.classrooms: list[Classroom] = []
+        self.divisions: list[Division] = []
         self.lessons: list[Lesson] = []

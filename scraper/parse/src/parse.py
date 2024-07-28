@@ -1,6 +1,7 @@
 from scraper.structures import (
     Class,
     Classroom,
+    Division,
     Group,
     Lesson,
     Period,
@@ -34,6 +35,9 @@ def parseTimetable(data):
 
     for x in timetable["classrooms"]:
         timetable_data.classrooms.append(Classroom(x))
+
+    for x in timetable["divisions"]:
+        timetable_data.divisions.append(Division(x))
 
     for x in timetable["lessons"]:
         timetable_data.lessons.append(Lesson(x))
