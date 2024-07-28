@@ -1,5 +1,6 @@
 import json
 
+from scraper.config import config
 from scraper.db import Database
 from scraper.log import LoggerFactory, LoggerUtils
 from scraper.parse import parseTimetable
@@ -11,7 +12,7 @@ class EdupageScraper:
     def __init__(self):
         self.logger = LoggerFactory.create_logger("EdupageScraper")
         self.replicator = Replicator()
-        self.db = Database()
+        self.db = Database(config.get_db_url())
 
     def scrapeTimetable(self):
         with LoggerUtils.timer(self.logger, "Fetching data"):

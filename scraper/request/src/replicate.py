@@ -2,6 +2,7 @@ import json
 
 import requests
 
+from scraper.config import config
 from scraper.log import LoggerFactory
 
 
@@ -25,10 +26,10 @@ class Replicator:
         return json.loads(response.text)
 
     def runRequests(self):
-        with open("req/ttv.json", "r", encoding="utf-8") as f:
+        with open(config.get_data_path("req/ttv.json"), "r", encoding="utf-8") as f:
             ttv_data = json.load(f)
 
-        with open("req/reg.json", "r", encoding="utf-8") as f:
+        with open(config.get_data_path("req/reg.json"), "r", encoding="utf-8") as f:
             ttn_data = json.load(f)
 
         # get list of timetables

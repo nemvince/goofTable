@@ -1,0 +1,8 @@
+[data]
+directory = "data"
+
+[db]
+type = "sqlite"
+
+[db.sqlite]
+name = "timetable.db"
