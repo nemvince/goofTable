@@ -24,14 +24,14 @@ class Database:
 
         # retrieve columns from table
         table = sa.Table(table_name, self.metadata, autoload=True)
-        self.logger.info(
+        self.logger.debug(
             f"Created table {table_name} with columns {table.columns.keys()}"
         )
 
     def insert(self, table_name, values):
         table = sa.Table(table_name, self.metadata, autoload=True)
         self.connection.execute(table.insert(), values)
-        self.logger.info(f"Inserted {len(values)} rows into {table_name}")
+        self.logger.debug(f"Inserted {len(values)} rows into {table_name}")
 
     def select(self, table_name, columns):
         table = sa.Table(table_name, self.metadata, autoload=True)
@@ -42,11 +42,12 @@ class Database:
         self.metadata.reflect(self.engine)
         table = self.metadata.tables.get(table_name)
         if table is None:
-            self.logger.warning(f"Table {table_name} does not exist")
+            self.logger.warning(f"Table {table_name} does not exist, skipping drop")
             return
         table.drop(bind=self.engine)
         self.connection.commit()
-        self.logger.warning(f"Dropped table {table_name}")
+        self.metadata.clear()
+        self.logger.debug(f"Dropped table {table_name}")
 
     def create_tables(self):
         _base_columns = [
