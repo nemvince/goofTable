@@ -1,37 +1,43 @@
-import requests
 import json
 
-def replicate(request):
-    url = request['params']['request']['url']
-    method = request['params']['request']['method']
-    headers = request['params']['request']['headers']
-    payload = request['params']['request']['postData']
+import requests
 
-    if method == 'GET':
-        response = requests.get(url, headers=headers)
-    else:
-        response = requests.post(url, headers=headers, data=payload)
+from util.logging import LoggerFactory
 
-    return json.loads(response.text)
 
-def runRequests():
-    with open("req/ttv.json", 'r', encoding="utf-8") as f:
-        request = json.load(f)
+class Replicator:
+    def __init__(self) -> None:
+        self.logger = LoggerFactory.create_logger("Replicator")
 
-    # get list of timetables
-    ttv = replicate(request)
+    def replicate(self, request):
+        url = request['params']['request']['url']
+        method = request['params']['request']['method']
+        headers = request['params']['request']['headers']
+        payload = request['params']['request']['postData']
 
-    # get the latest timetable
-    ttn = ttv['r']['regular']['timetables'][-1]['tt_num']
+        if method == 'GET':
+            response = requests.get(url, headers=headers)
+        else:
+            response = requests.post(url, headers=headers, data=payload)
 
-    with open("req/reg.json", "r", encoding="utf-8") as f:
-        request = json.load(f)
+        self.logger.debug(f"Replicated request: {response.status_code}")
 
-    # replace the placeholder with the latest timetable number
-    request['params']['request']['postData'] = request['params']['request']['postData'].replace("TTNUM_REPLACEME", ttn)
-    
-    reg = replicate(request)
+        return json.loads(response.text)
 
-    # with open("resp.json", 'w', encoding="utf-8") as f:
-    #     f.write(json.dumps(reg, indent=4))
-    return reg
+    def runRequests(self):
+        with open("req/ttv.json", 'r', encoding="utf-8") as f:
+            ttv_data = json.load(f)
+
+        with open("req/reg.json", "r", encoding="utf-8") as f:
+            ttn_data = json.load(f)
+
+        # get list of timetables
+        ttv = self.replicate(ttv_data)
+
+        # replace the placeholder with the latest timetable number
+        ttn_data['params']['request']['postData'] = ttn_data['params']['request']['postData'].replace("TTNUM_REPLACEME", ttv['r']['regular']['timetables'][-1]['tt_num'])
+
+        # get the latest timetable
+        reg = self.replicate(ttn_data)
+
+        return reg

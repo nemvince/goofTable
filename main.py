@@ -1,40 +1,50 @@
 import json
-from util.replicate import runRequests
+
+from util.db import Database
+from util.logging import LoggerFactory, LoggerUtils
 from util.parse import parseTimetable
-from util.logging import Logger
+from util.replicate import Replicator
+from util.selenium import SeleniumScraper
+
 
 class EdupageScraper:
     def __init__(self):
-        self.logger = Logger("EdupageScraper")
+        self.logger = LoggerFactory.create_logger("EdupageScraper")
+        self.replicator = Replicator()
+        self.db = Database("sqlite:///edupage.db")
 
     def scrapeTimetable(self):
-        with self.logger.timer("Fetching data"):
-            data = runRequests()
+        with LoggerUtils.timer(self.logger, "Fetching data"):
+            data = self.replicator.runRequests()
 
-        with self.logger.timer("Parsing data"):
+        with open("data.json", "w") as f:
+            json.dump(data, f)
+
+        with LoggerUtils.timer(self.logger, "Parsing data"):
             timetable = parseTimetable(data)
 
         return timetable
 
     def run(self):
-        logger = Logger("main")
-
         try:
             timetable = self.scrapeTimetable()
         except Exception as e:
-            logger.warning(f"An error occurred: {e}")
-            logger.info("Running selenium scraper to refetch requests")
-            from util.selenium import SeleniumScraper
-            s = SeleniumScraper(logger)
-            s.scrapeRequestsToFile()
+            self.logger.warning(f"An error occurred: {e}")
+            self.logger.info("Running selenium scraper to refetch requests")
+            s = SeleniumScraper()
+            with LoggerUtils.timer(self.logger, "Scraping requests"):
+                s.scrapeRequestsToFile()
             try:
-                timetable = self.scrapeTimetable()            
+                timetable = self.scrapeTimetable()
             except Exception as e:
-                logger.error(f"FATAL: Failed even after selenium rerun, something is wrong!\n{e}")
+                self.logger.error(f"FATAL: Failed even after selenium rerun, something is wrong!\n{e}")
                 exit()
 
-        with open("timetable.json", 'w', encoding="utf-8") as f:
-            f.write(json.dumps(timetable, indent=4))
+        self.logger.info("Successfully scraped timetable data")
+
+        with LoggerUtils.timer(self.logger, "Inserting data into database"):
+            self.db.update_timetable(timetable)
+
 
 if __name__ == "__main__":
     s = EdupageScraper()

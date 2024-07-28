@@ -1,38 +1,29 @@
-from contextlib import contextmanager
 import logging
 import time
+from contextlib import contextmanager
+
 import colorlog
 
-class Logger:
-    def __init__(self, name, level=logging.INFO):
-        self.logger = logging.getLogger(name)
-        self.logger.setLevel(level)
+
+class LoggerFactory:
+    @staticmethod
+    def create_logger(name, level=logging.INFO):
+        logger = logging.getLogger(name)
+        logger.setLevel(level)
 
         # Create a console handler
         handler = colorlog.StreamHandler()
-
         handler.setFormatter(colorlog.ColoredFormatter('%(asctime)s - %(log_color)s%(name)s:%(levelname)s: %(message)s'))
 
-        self.logger.addHandler(handler)
+        logger.addHandler(handler)
 
-    def info(self, msg):
-        self.logger.info(msg)
+        return logger
 
-    def error(self, msg):
-        self.logger.error(msg)
 
-    def debug(self, msg):
-        self.logger.debug(msg)
-
-    def warning(self, msg):
-        self.logger.warning(msg)
-
-    def critical(self, msg):
-        self.logger.critical(msg)
-
+class LoggerUtils:
     @contextmanager
-    def timer(self, msg):
+    def timer(logger, msg):
         start_time = time.time()
         yield
         end_time = time.time()
-        self.info(f"{msg} took {round((end_time - start_time), 3)} seconds")
+        logger.info(f"{msg} took {round((end_time - start_time), 3)} seconds")

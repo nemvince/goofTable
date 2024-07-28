@@ -1,83 +1,33 @@
-import json
+from util.data.structures import Class, Classroom, Group, Lesson, Period, Teacher, Timetable
+
 
 def parseTimetable(data):
     timetable = {}
-    
-    # Extract relevant tables
+
+    # extract relevant tables
     tables = data["r"]["dbiAccessorRes"]["tables"]
-    
-    # Parse classes
-    classes = next((table for table in tables if table["id"] == "classes"), None)
-    if classes:
-        timetable["classes"] = []
-        for class_ in classes["data_rows"]:
-            d = {
-                "id": class_['id'],
-                "name": class_['name'],
-                "short": class_['short']
-            }
-            timetable["classes"].append(d)
 
-    # Parse groups
-    groups = next((table for table in tables if table["id"] == "groups"), None)
-    if groups:
-        timetable["groups"] = []
-        for group in groups["data_rows"]:
-            d = {
-                "id": group['id'],
-                "divisionid": group['divisionid'],
-                "name": group['name'],
-                "classid": group['classid'],
-                "entireclass": group['entireclass'],
-            }
-            timetable["groups"].append(d)
+    for table in tables:
+        timetable[table["id"]] = table["data_rows"]
 
-    # Parse teachers
-    teachers = next((table for table in tables if table["id"] == "teachers"), None)
-    if teachers:
-        timetable["teachers"] = []
-        for teacher in teachers["data_rows"]:
-            d = {
-                "id": teacher['id'],
-                "name": teacher['name'],
-            }
-            timetable["teachers"].append(d)
+    # dump data into structured classes
+    timetable_data = Timetable()
+    for x in timetable["classes"]:
+        timetable_data.classes.append(Class(x))
 
-    # Parse periods
-    periods = next((table for table in tables if table["id"] == "periods"), None)
-    if periods:
-        timetable["periods"] = []
-        for period in periods["data_rows"]:
-          d = {
-              "name": period['name'],
-              "start": period['starttime'],
-              "end": period['endtime']
-          }
-          timetable["periods"].append(d)
+    for x in timetable["groups"]:
+        timetable_data.groups.append(Group(x))
 
-    # Parse classrooms
-    classrooms = next((table for table in tables if table["id"] == "classrooms"), None)
-    if classrooms:
-        timetable["classrooms"] = []
-        for classroom in classrooms["data_rows"]:
-          d = {
-              "id": classroom['id'],
-              "name": classroom['name'],
-              "short": classroom['short']
-          }
-          timetable["classrooms"].append(d)
-    
-    # Parse lessons
-    lessons = next((table for table in tables if table["id"] == "lessons"), None)
-    if lessons:
-        timetable["lessons"] = lessons["data_rows"]
-    
-    return timetable
+    for x in timetable["teachers"]:
+        timetable_data.teachers.append(Teacher(x))
 
-if __name__ == "__main__":
-    with open("resp.json", 'r', encoding="utf-8") as f:
-        data = json.load(f)
+    for x in timetable["periods"]:
+        timetable_data.periods.append(Period(x))
 
-    timetable_data = parseTimetable(data)
-    with open("timetable.json", 'w', encoding="utf-8") as f:
-        f.write(json.dumps(timetable_data, indent=4))
+    for x in timetable["classrooms"]:
+        timetable_data.classrooms.append(Classroom(x))
+
+    for x in timetable["lessons"]:
+        timetable_data.lessons.append(Lesson(x))
+
+    return timetable_data
