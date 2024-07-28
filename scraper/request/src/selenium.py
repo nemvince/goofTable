@@ -1,13 +1,13 @@
 import json
 import logging
 
+from scraper.log import LoggerFactory
+
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
-
-from util.logging import LoggerFactory
 
 
 class SeleniumScraper:

@@ -1,7 +1,7 @@
-import sqlalchemy as sa
+from scraper.log import LoggerFactory
+from scraper.structures import Timetable
 
-from util.data.structures import Timetable
-from util.logging import LoggerFactory
+import sqlalchemy as sa
 
 
 class Database:

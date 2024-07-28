@@ -1,10 +1,10 @@
 import json
 
-from util.db import Database
-from util.logging import LoggerFactory, LoggerUtils
-from util.parse import parseTimetable
-from util.replicate import Replicator
-from util.selenium import SeleniumScraper
+from scraper.db import Database
+from scraper.log import LoggerFactory, LoggerUtils
+from scraper.parse import parseTimetable
+from scraper.request import Replicator
+from scraper.request import SeleniumScraper
 
 
 class EdupageScraper:
@@ -46,8 +46,3 @@ class EdupageScraper:
 
         with LoggerUtils.timer(self.logger, "Inserting data into database"):
             self.db.update_timetable(timetable)
-
-
-if __name__ == "__main__":
-    s = EdupageScraper()
-    s.run()

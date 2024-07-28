@@ -1,4 +1,4 @@
-from util.data.structures import (
+from scraper.structures import (
     Class,
     Classroom,
     Group,

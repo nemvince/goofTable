@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from util.logging import LoggerFactory
+from scraper.log import LoggerFactory
 
 
 class Replicator:
